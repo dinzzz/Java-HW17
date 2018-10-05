@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.button {
+    background-color: #000000;
+    color: white;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+body {
+    background-image: url("https://pre00.deviantart.net/dd32/th/pre/f/2013/231/3/1/dark_blue_wallpaper_by_malkowitch-d6iuhnh.jpg");
+}
+
+p {
+	color: white;
+	text-align: center;
+}
+
+h1 {
+	color: lightblue;
+    text-align: center;
+}
+
+h3 {
+	color: white;
+    text-align: center;
+}
+
+hr {
+	color: white;	
+    border: 0;
+    height: 0; 
+    box-shadow: 0 0 10px 1px black;
+}
+
+img {
+	display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+</style>
+<meta charset="UTF-8">
+<title>Gallery</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<script>
+	function tags() {
+		var xmlhttp;
+
+		if (window.XMLHttpRequest) {
+			// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp = new XMLHttpRequest();
+		} else {
+			// code for IE6, IE5
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				var text = xmlhttp.responseText;
+				console.log(text);
+				var data = JSON.parse(text);
+				var html = "";
+				for (var i = 0; i < data.tags.length; i++) {
+					html += "<div id = \"" + data.tags[i] + "\">"
+					html += "<input type=button class=\"button\" value=\"";
+					html += data.tags[i] + "\" onclick=\"thumbnail('"+data.tags[i] + "')\">";
+					html += "<br><br><hr>";
+					html += "<\/div>";
+					html += "<div id=\"" + data.tags[i] + "img\"></div>";
+
+				}
+				document.getElementById("tags").innerHTML = html;
+				console.log(html);
+			}
+		}
+		xmlhttp.open("GET", "rest/tags");
+		xmlhttp.send();
+	};
+	
+	function thumbnail(tag) {
+		console.log(tag);
+		var xmlhttp;
+
+		if (window.XMLHttpRequest) {
+			// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp = new XMLHttpRequest();
+		} else {
+			// code for IE6, IE5
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				var text = xmlhttp.responseText;
+				var data = JSON.parse(text);
+				var html = "";
+				for (var i = 0; i < data.thumbs.length; i++) {
+					html += "<img src = \"" + data.thumbs[i].thumbnail +  "\" onclick=\"image('" + data.thumbs[i].img + "', '" + tag + "')\"> &nbsp;";
+				}
+				html+= "<br><hr>"
+				document.getElementById(tag).innerHTML += html;
+			}	
+			
+		}
+		xmlhttp.open("GET", "rest/thumbnails/" + tag);
+		xmlhttp.send();
+	};
+	
+	function image(img, tag){
+		var xmlhttp;
+
+		if (window.XMLHttpRequest) {
+			// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp = new XMLHttpRequest();
+		} else {
+			// code for IE6, IE5
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				var id = tag + "img";
+				var text = xmlhttp.responseText;
+				var data = JSON.parse(text);
+				var html = "";
+					html += "<img src = \"" + data.image +  "\">";
+					html+= "<br>"
+					html+= "<p>" + data.description + "</p>"
+					html+= "<p>Tags: " + data.tags + "</p>"
+					html+= "<br><hr>"
+				document.getElementById(id).innerHTML = html;
+			}	
+			
+		}
+		xmlhttp.open("GET", "rest/images/" + img);
+		xmlhttp.send();
+	};
+</script>
+
+<script>
+	$(document).ready(function() {
+		tags();
+	});
+</script>
+
+
+
+</head>
+<body>
+	<h1>Automobile gems</h1>
+	<h3>Burn rubber, not your soul.</h3>
+	<div id="tags"></div>
+</body>
+</html>
